@@ -5,29 +5,55 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 from eralchemy import render_er
+from datetime import datetime
+
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
+class User(Base):
+    __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+    username = Column(String(100), nullable=False)
+    email = Column(String(120))
+    cell_number = Column(Integer)
+    password = Column(String(100), nullable=False)
+    biography = Column(String(250))
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
+    def serialize(self):
+        return{
+            "id": self.id,
+            "usermane": self.name,
+            "biography": self.biography
+        }
+
+class Posts(Base):
+    __tablename__ = 'posts'
     id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    photo_url = Column(String(256), nullable=False)
+    post_header = Column(String(256))
+    date = Column(Integer, nullable=False, default=datetime.utcnow)
 
-    def to_dict(self):
-        return {}
+class Followers(Base):
+    __tablename__ = 'followers' 
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    follower_id = Column(Integer, ForeignKey('user.id'))
+
+    
+class Likes(Base):
+    __tablename__ = 'Likes' 
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    post_id = Column(Integer, ForeignKey('posts.id'))
+
+class Coments(Base):
+    __tablename__ = 'coments' 
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    post_id = Column(Integer, ForeignKey('posts.id'))
+    coment = Column(String(256))
+
 
 ## Draw from SQLAlchemy base
 try:
